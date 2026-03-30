@@ -1,0 +1,410 @@
+/* ============================================ */
+/*  KRIPTOLOJI APP - Ana Stil Dosyasi (USS)     */
+/*  Material Design Dark Theme + Tailwind Slate */
+/* ============================================ */
+
+/* --- Root --- */
+:root {
+    /* Surfaces - Tailwind Slate palette */
+    --color-bg: rgb(15, 23, 42);           /* slate-900 */
+    --color-panel: rgb(30, 41, 59);         /* slate-800 */
+    --color-surface: rgb(51, 65, 85);       /* slate-700 */
+    --color-input-bg: rgb(15, 23, 42);      /* slate-900 (inset) */
+    --color-input-border: rgb(71, 85, 105); /* slate-600 */
+    --color-border: rgb(51, 65, 85);        /* slate-700 */
+    --color-tab-inactive: rgb(30, 41, 59);  /* slate-800 */
+
+    /* Accent - desaturated 400 tones */
+    --color-accent: rgb(56, 189, 248);      /* sky-400 */
+    --color-accent-hover: rgb(125, 211, 252); /* sky-300 */
+    --color-tab-active: rgb(56, 189, 248);  /* sky-400 */
+
+    /* Buttons */
+    --color-green: rgb(16, 185, 129);       /* emerald-500 */
+    --color-green-hover: rgb(52, 211, 153); /* emerald-400 */
+    --color-red: rgb(244, 63, 94);          /* rose-500 */
+    --color-red-hover: rgb(251, 113, 133);  /* rose-400 */
+    --color-blue: rgb(59, 130, 246);        /* blue-500 */
+    --color-blue-hover: rgb(96, 165, 250);  /* blue-400 */
+
+    /* Text - Material Design opacity levels */
+    --color-text: rgb(226, 232, 240);       /* slate-200 (~87% white) */
+    --color-text-dim: rgb(148, 163, 184);   /* slate-400 (~60% white) */
+    --color-text-accent: rgb(56, 189, 248); /* sky-400 */
+    --color-yellow: rgb(251, 191, 36);      /* amber-400 */
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+}
+
+/* --- Genel Yapilar --- */
+.root-container {
+    flex-grow: 1;
+    background-color: var(--color-bg);
+    padding: 16px;
+    -unity-font: resource('LiberationSans');
+}
+
+/* --- Baslik --- */
+.app-title {
+    font-size: 26px;
+    color: white;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background-color: var(--color-panel);
+    border-radius: var(--radius-md);
+    border-bottom-width: 2px;
+    border-bottom-color: var(--color-accent);
+}
+
+/* --- Tab Bar --- */
+.tab-bar {
+    flex-direction: row;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
+.tab-button {
+    flex-grow: 1;
+    height: 44px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: var(--color-text-dim);
+    background-color: var(--color-tab-inactive);
+    border-width: 0;
+    border-bottom-width: 2px;
+    border-bottom-color: transparent;
+    margin-right: 4px;
+    margin-left: 4px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    transition-property: background-color, color, border-bottom-color;
+    transition-duration: 0.15s;
+}
+
+.tab-button:hover {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+}
+
+.tab-button.tab-active {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border-bottom-color: var(--color-accent);
+}
+
+/* --- Panel Container --- */
+.panel-container {
+    flex-grow: 1;
+}
+
+/* --- Crypto Panel --- */
+.crypto-panel {
+    flex-grow: 1;
+    background-color: var(--color-panel);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    display: none;
+    overflow: visible;
+}
+
+.crypto-panel.panel-active {
+    display: flex;
+}
+
+.panel-title {
+    font-size: 18px;
+    -unity-font-style: bold;
+    color: var(--color-text-accent);
+    -unity-text-align: middle-center;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--color-border);
+}
+
+/* --- Sections --- */
+.section-label {
+    font-size: 13px;
+    -unity-font-style: bold;
+    color: var(--color-yellow);
+    -unity-text-align: middle-center;
+    letter-spacing: 3px;
+    margin-top: 6px;
+    margin-bottom: 8px;
+}
+
+/* --- Form Row --- */
+.form-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.form-label {
+    width: 140px;
+    min-width: 140px;
+    font-size: 14px;
+    color: var(--color-text);
+    -unity-text-align: middle-right;
+    margin-right: 10px;
+    -unity-font-style: bold;
+}
+
+.form-input {
+    flex-grow: 1;
+    height: 34px;
+    font-size: 14px;
+    color: var(--color-text);
+    background-color: var(--color-input-bg);
+    border-width: 1px;
+    border-color: var(--color-input-border);
+    border-radius: var(--radius-sm);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Unity internal TextField overrides */
+.form-input .unity-text-field__input {
+    background-color: var(--color-input-bg);
+    border-width: 0;
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    padding: 0 10px;
+}
+
+.form-input .unity-text-element {
+    color: var(--color-text);
+}
+
+.form-input:focus .unity-text-field__input {
+    border-width: 0;
+    background-color: var(--color-input-bg);
+}
+
+.form-input:focus {
+    border-color: var(--color-accent);
+}
+
+.form-input.readonly {
+    background-color: rgb(20, 28, 46);
+    color: var(--color-text-dim);
+}
+
+.form-input.readonly .unity-text-field__input {
+    background-color: rgb(20, 28, 46);
+    color: var(--color-text-dim);
+}
+
+.form-input.readonly .unity-text-element {
+    color: var(--color-text-dim);
+}
+
+/* --- Butonlar --- */
+.button-row {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+.btn {
+    height: 36px;
+    min-width: 140px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    border-width: 0;
+    border-radius: var(--radius-sm);
+    margin-left: 6px;
+    margin-right: 6px;
+    padding-left: 16px;
+    padding-right: 16px;
+    transition-property: background-color, scale;
+    transition-duration: 0.12s;
+}
+
+/* Unity internal Button text override */
+.btn .unity-text-element {
+    color: white;
+}
+
+.btn:hover {
+    scale: 1.03;
+}
+
+.btn:active {
+    scale: 0.97;
+}
+
+.btn-green {
+    background-color: var(--color-green);
+}
+
+.btn-green:hover {
+    background-color: var(--color-green-hover);
+}
+
+.btn-red {
+    background-color: var(--color-red);
+}
+
+.btn-red:hover {
+    background-color: var(--color-red-hover);
+}
+
+.btn-blue {
+    background-color: var(--color-blue);
+}
+
+.btn-blue:hover {
+    background-color: var(--color-blue-hover);
+}
+
+.btn-default {
+    background-color: var(--color-surface);
+}
+
+.btn-default:hover {
+    background-color: rgb(71, 85, 105);
+}
+
+/* --- Dropdown --- */
+.aes-dropdown {
+    height: 34px;
+    min-width: 200px;
+    max-width: 280px;
+    font-size: 14px;
+    background-color: var(--color-input-bg);
+    border-width: 1px;
+    border-color: var(--color-input-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.aes-dropdown .unity-base-popup-field__input {
+    background-color: var(--color-input-bg);
+    border-width: 0;
+    color: var(--color-text);
+    padding-left: 8px;
+}
+
+.aes-dropdown .unity-text-element {
+    color: var(--color-text);
+}
+
+.aes-dropdown .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: var(--color-text-dim);
+}
+
+/* --- Status --- */
+.status-label {
+    font-size: 13px;
+    -unity-text-align: middle-center;
+    margin-top: 6px;
+    min-height: 20px;
+    color: var(--color-green);
+}
+
+.status-error {
+    color: var(--color-red);
+}
+
+/* --- Visualization Overlay --- */
+.visual-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(2, 6, 23, 0.97);
+    padding: 16px;
+    display: none;
+}
+
+.visual-overlay.overlay-active {
+    display: flex;
+}
+
+.visual-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.visual-title {
+    font-size: 22px;
+    -unity-font-style: bold;
+    color: var(--color-text-accent);
+}
+
+.visual-close-btn {
+    height: 34px;
+    min-width: 100px;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    background-color: var(--color-red);
+    border-width: 0;
+    border-radius: var(--radius-sm);
+}
+
+.visual-close-btn:hover {
+    background-color: var(--color-red-hover);
+}
+
+/* --- Visual Scroll + Text --- */
+.visual-scroll {
+    flex-grow: 1;
+    background-color: rgb(2, 6, 23);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+}
+
+.visual-text {
+    font-size: 14px;
+    color: var(--color-text);
+    white-space: normal;
+}
+
+/* --- Dropdown Row --- */
+.dropdown-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+    justify-content: center;
+    overflow: visible;
+}
+
+.dropdown-label {
+    font-size: 14px;
+    color: var(--color-text);
+    -unity-font-style: bold;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+/* --- Separator --- */
+.separator {
+    height: 1px;
+    background-color: var(--color-border);
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+
+/* --- Scrollbar styling --- */
+.unity-scroller--vertical {
+    width: 8px;
+}
+
+.unity-scroller--vertical .unity-base-slider__dragger {
+    background-color: rgb(80, 80, 120);
+    border-radius: 4px;
+}

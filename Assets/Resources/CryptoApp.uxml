@@ -1,0 +1,196 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements"
+         editor-extension-mode="False">
+    <Style src="CryptoApp.uss" />
+
+    <ui:VisualElement class="root-container">
+
+        <!-- Baslik -->
+        <ui:Label text="KRIPTOLOJI  -  Sifreleme Uygulamasi" class="app-title" />
+
+        <!-- Tab Bar -->
+        <ui:VisualElement class="tab-bar">
+            <ui:Button name="tab-otp" text="OTP (Stream)" class="tab-button tab-active" />
+            <ui:Button name="tab-des" text="DES (Block)" class="tab-button" />
+            <ui:Button name="tab-aes" text="AES (Block)" class="tab-button" />
+        </ui:VisualElement>
+
+        <!-- Panel Container -->
+        <ui:VisualElement class="panel-container">
+
+            <!-- ============ OTP Panel ============ -->
+            <ui:VisualElement name="panel-otp" class="crypto-panel panel-active">
+                <ui:Label text="OTP  -  One Time Pad (Stream Cipher)" class="panel-title" />
+
+                <ui:Label text="SIFRELEME" class="section-label" />
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Duz Metin:" class="form-label" />
+                    <ui:TextField name="otp-plain" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Anahtar:" class="form-label" />
+                    <ui:TextField name="otp-key" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="button-row">
+                    <ui:Button name="otp-genkey" text="Anahtar Uret" class="btn btn-default" />
+                    <ui:Button name="otp-encrypt" text="SIFRELE" class="btn btn-green" />
+                    <ui:Button name="otp-visualize" text="Adimlari Goster" class="btn btn-blue" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:TextField name="otp-cipher" class="form-input readonly" readonly="true" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="separator" />
+                <ui:Label text="SIFRE COZME" class="section-label" />
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:TextField name="otp-dec-cipher" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Anahtar:" class="form-label" />
+                    <ui:TextField name="otp-dec-key" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="button-row">
+                    <ui:Button name="otp-decrypt" text="COZ" class="btn btn-red" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Cozulmus Metin:" class="form-label" />
+                    <ui:TextField name="otp-dec-output" class="form-input readonly" readonly="true" />
+                </ui:VisualElement>
+
+                <ui:Label name="otp-status" class="status-label" />
+            </ui:VisualElement>
+
+            <!-- ============ DES Panel ============ -->
+            <ui:VisualElement name="panel-des" class="crypto-panel">
+                <ui:Label text="DES  -  Data Encryption Standard (Block Cipher)" class="panel-title" />
+
+                <ui:Label text="SIFRELEME" class="section-label" />
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Duz Metin:" class="form-label" />
+                    <ui:TextField name="des-plain" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:TextField name="des-key" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="button-row">
+                    <ui:Button name="des-genkey" text="Anahtar Uret" class="btn btn-default" />
+                    <ui:Button name="des-encrypt" text="SIFRELE" class="btn btn-green" />
+                    <ui:Button name="des-visualize" text="Adimlari Goster" class="btn btn-blue" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:TextField name="des-cipher" class="form-input readonly" readonly="true" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="separator" />
+                <ui:Label text="SIFRE COZME" class="section-label" />
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:TextField name="des-dec-cipher" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:TextField name="des-dec-key" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="button-row">
+                    <ui:Button name="des-decrypt" text="COZ" class="btn btn-red" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Cozulmus Metin:" class="form-label" />
+                    <ui:TextField name="des-dec-output" class="form-input readonly" readonly="true" />
+                </ui:VisualElement>
+
+                <ui:Label name="des-status" class="status-label" />
+            </ui:VisualElement>
+
+            <!-- ============ AES Panel ============ -->
+            <ui:VisualElement name="panel-aes" class="crypto-panel">
+                <ui:Label text="AES  -  Advanced Encryption Standard (Block Cipher)" class="panel-title" />
+
+                <ui:Label text="SIFRELEME" class="section-label" />
+
+                <ui:VisualElement class="dropdown-row">
+                    <ui:Label text="Anahtar Boyutu:" class="dropdown-label" />
+                    <ui:DropdownField name="aes-keysize" class="aes-dropdown"
+                        choices="AES-128 (16 byte),AES-192 (24 byte),AES-256 (32 byte)" index="0" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Duz Metin:" class="form-label" />
+                    <ui:TextField name="aes-plain" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:TextField name="aes-key" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="button-row">
+                    <ui:Button name="aes-genkey" text="Anahtar Uret" class="btn btn-default" />
+                    <ui:Button name="aes-encrypt" text="SIFRELE" class="btn btn-green" />
+                    <ui:Button name="aes-visualize" text="Adimlari Goster" class="btn btn-blue" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:TextField name="aes-cipher" class="form-input readonly" readonly="true" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="separator" />
+                <ui:Label text="SIFRE COZME" class="section-label" />
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:TextField name="aes-dec-cipher" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:TextField name="aes-dec-key" class="form-input" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="button-row">
+                    <ui:Button name="aes-decrypt" text="COZ" class="btn btn-red" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="form-row">
+                    <ui:Label text="Cozulmus Metin:" class="form-label" />
+                    <ui:TextField name="aes-dec-output" class="form-input readonly" readonly="true" />
+                </ui:VisualElement>
+
+                <ui:Label name="aes-status" class="status-label" />
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <!-- ============ Visualization Overlay ============ -->
+        <ui:VisualElement name="visual-overlay" class="visual-overlay">
+            <ui:VisualElement class="visual-header">
+                <ui:Label text="Algoritma Adimlari" class="visual-title" />
+                <ui:Button name="visual-close" text="X  KAPAT" class="visual-close-btn" />
+            </ui:VisualElement>
+            <ui:ScrollView name="visual-scroll" class="visual-scroll">
+                <ui:Label name="visual-text" class="visual-text" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
