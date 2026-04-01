@@ -576,17 +576,15 @@ namespace Kriptoloji.UI
 
                 OutputFormat fmt = GetSelectedFormat(otpFormat);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
-                string plaintext = System.Text.Encoding.UTF8.GetString(ptBytes);
 
                 string keyInput = otpKey.value;
-                string textKey = null;
+                byte[] keyBytes = null;
                 if (!string.IsNullOrEmpty(keyInput))
                 {
-                    byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, fmt);
-                    textKey = System.Text.Encoding.UTF8.GetString(keyBytes);
+                    keyBytes = CryptoFormatter.FormatToBytes(keyInput, fmt);
                 }
 
-                var steps = CryptoVisualizer.VisualizeOTPEncrypt(plaintext, textKey);
+                var steps = CryptoVisualizer.VisualizeOTPEncrypt(ptBytes, keyBytes, fmt);
                 ShowVisualization(steps);
             }
             catch (Exception ex)
@@ -615,17 +613,15 @@ namespace Kriptoloji.UI
                 OutputFormat fmt = GetSelectedFormat(desFormat);
                 OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
-                string plaintext = System.Text.Encoding.UTF8.GetString(ptBytes);
                 byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
-                string keyHex = OTPCipher.BytesToHex(keyBytes);
 
-                if (keyHex.Length != 16)
+                if (keyBytes.Length != 8)
                 {
                     SetStatus(desStatus, "Anahtar 8 byte (64-bit) olmali!", true);
                     return;
                 }
 
-                var steps = CryptoVisualizer.VisualizeDESEncrypt(plaintext, keyHex);
+                var steps = CryptoVisualizer.VisualizeDESEncrypt(ptBytes, keyBytes, fmt);
                 ShowVisualization(steps);
             }
             catch (Exception ex)
@@ -654,11 +650,9 @@ namespace Kriptoloji.UI
                 OutputFormat fmt = GetSelectedFormat(aesFormat);
                 OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
-                string plaintext = System.Text.Encoding.UTF8.GetString(ptBytes);
                 byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
-                string keyHex = OTPCipher.BytesToHex(keyBytes);
 
-                var steps = CryptoVisualizer.VisualizeAESEncrypt(plaintext, keyHex);
+                var steps = CryptoVisualizer.VisualizeAESEncrypt(ptBytes, keyBytes, fmt);
                 ShowVisualization(steps);
             }
             catch (Exception ex)

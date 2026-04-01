@@ -12,19 +12,17 @@ namespace Kriptoloji.Crypto
     {
         // ==================== OTP Gorsellestirme ====================
 
-        public static List<string> VisualizeOTPEncrypt(string plaintext, string textKey)
+        public static List<string> VisualizeOTPEncrypt(byte[] ptBytes, byte[] keyBytes, OutputFormat fmt)
         {
             var steps = new List<string>();
-            byte[] ptBytes = Encoding.UTF8.GetBytes(plaintext);
-            byte[] key;
-            if (string.IsNullOrEmpty(textKey))
+            OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+            string fmtLabel = GetFormatLabel(fmt);
+            string cipherFmtLabel = GetFormatLabel(cipherFmt);
+
+            if (keyBytes == null || keyBytes.Length == 0)
             {
-                textKey = OTPCipher.GenerateTextKey(ptBytes.Length);
-                key = Encoding.UTF8.GetBytes(textKey);
-            }
-            else
-            {
-                key = Encoding.UTF8.GetBytes(textKey);
+                keyBytes = new byte[ptBytes.Length];
+                new System.Random().NextBytes(keyBytes);
             }
 
             steps.Add("<color=#4DC8FF><b>===  OTP (One-Time Pad) SIFRELEME  ===</b></color>");
@@ -32,30 +30,16 @@ namespace Kriptoloji.Crypto
             steps.Add("<color=#CCB833>Kural:  C = M XOR K  (her byte birebir XOR'lanir)</color>");
             steps.Add("");
 
-            // Metin -> Byte
-            steps.Add("<color=#88CC88>[Adim 1]</color> Metin UTF-8 byte dizisine cevrilir:");
-            var sbText = new StringBuilder("  \"" + plaintext + "\"  ->  ");
-            for (int i = 0; i < ptBytes.Length; i++)
-            {
-                if (i > 0) sbText.Append(" ");
-                sbText.AppendFormat("{0:X2}", ptBytes[i]);
-            }
-            steps.Add(sbText.ToString());
+            // Veri
+            steps.Add($"<color=#88CC88>[Adim 1]</color> Veri ({fmtLabel} formatinda):");
+            steps.Add("  " + CryptoFormatter.BytesToFormat(ptBytes, fmt));
             steps.Add($"  Uzunluk: {ptBytes.Length} byte");
             steps.Add("");
 
             // Anahtar
-            steps.Add("<color=#88CC88>[Adim 2]</color> Anahtar (metin olarak, ayni uzunlukta):");
-            steps.Add($"  K = \"{textKey}\"");
-            var sbKey = new StringBuilder("  K (byte) = ");
-            for (int i = 0; i < key.Length; i++)
-            {
-                if (i > 0) sbKey.Append(" ");
-                sbKey.AppendFormat("{0:X2}", key[i]);
-            }
-            steps.Add(sbKey.ToString());
-            steps.Add($"  Mesaj uzunlugu: {plaintext.Length} karakter  |  Anahtar uzunlugu: {textKey.Length} karakter");
-            steps.Add($"  Byte uzunlugu:  |M| = {ptBytes.Length}  |  |K| = {key.Length}");
+            steps.Add($"<color=#88CC88>[Adim 2]</color> Anahtar ({fmtLabel} formatinda, ayni uzunlukta):");
+            steps.Add("  K = " + CryptoFormatter.BytesToFormat(keyBytes, fmt));
+            steps.Add($"  Byte uzunlugu:  |M| = {ptBytes.Length}  |  |K| = {keyBytes.Length}");
             steps.Add("");
 
             // XOR islemleri
@@ -64,21 +48,22 @@ namespace Kriptoloji.Crypto
             int showCount = Math.Min(ptBytes.Length, 6);
             for (int i = 0; i < showCount; i++)
             {
-                cipher[i] = (byte)(ptBytes[i] ^ key[i]);
-                steps.Add($"  Byte {i}: {ptBytes[i]:X2} XOR {key[i]:X2} = <color=#FFAA44>{cipher[i]:X2}</color>    " +
-                           $"({Convert.ToString(ptBytes[i], 2).PadLeft(8, '0')} XOR {Convert.ToString(key[i], 2).PadLeft(8, '0')} = {Convert.ToString(cipher[i], 2).PadLeft(8, '0')})");
+                cipher[i] = (byte)(ptBytes[i] ^ keyBytes[i]);
+                string line = $"  Byte {i}: {FormatSingleByte(ptBytes[i], fmt)} XOR {FormatSingleByte(keyBytes[i], fmt)} = <color=#FFAA44>{FormatSingleByte(cipher[i], fmt)}</color>";
+                if (fmt != OutputFormat.Binary)
+                    line += $"    ({Convert.ToString(ptBytes[i], 2).PadLeft(8, '0')} XOR {Convert.ToString(keyBytes[i], 2).PadLeft(8, '0')} = {Convert.ToString(cipher[i], 2).PadLeft(8, '0')})";
+                steps.Add(line);
             }
-            // Kalanini hesapla
             for (int i = showCount; i < ptBytes.Length; i++)
-                cipher[i] = (byte)(ptBytes[i] ^ key[i]);
+                cipher[i] = (byte)(ptBytes[i] ^ keyBytes[i]);
 
             if (ptBytes.Length > showCount)
                 steps.Add($"  ... ({ptBytes.Length - showCount} byte daha)");
             steps.Add("");
 
             // Sonuc
-            steps.Add("<color=#88CC88>[Sonuc]</color> Sifreli metin (Hex):");
-            steps.Add("  C = " + OTPCipher.BytesToHex(cipher));
+            steps.Add($"<color=#88CC88>[Sonuc]</color> Sifreli veri ({cipherFmtLabel}):");
+            steps.Add("  C = " + CryptoFormatter.BytesToFormat(cipher, cipherFmt));
             steps.Add("");
             steps.Add("<color=#999999>NOT: Anahtar yalnizca 1 kez kullanilmalidir!</color>");
             steps.Add("<color=#999999>Ayni anahtarla 2 mesaj sifrelenmesi guvenilmezdir.</color>");
@@ -88,16 +73,23 @@ namespace Kriptoloji.Crypto
 
         // ==================== DES Gorsellestirme ====================
 
-        public static List<string> VisualizeDESEncrypt(string plaintext, string keyHex)
+        public static List<string> VisualizeDESEncrypt(byte[] ptBytes, byte[] key, OutputFormat fmt)
         {
             var steps = new List<string>();
-            byte[] ptBytes = Encoding.UTF8.GetBytes(plaintext);
-            byte[] key = DESCipher.HexToBytes(keyHex);
+            OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+            string fmtLabel = GetFormatLabel(fmt);
+            string cipherFmtLabel = GetFormatLabel(cipherFmt);
 
             steps.Add("<color=#4DC8FF><b>===  DES SIFRELEME ADIMLARI  ===</b></color>");
             steps.Add("");
             steps.Add("<color=#CCB833>Yapi: 16-round Feistel Network</color>");
             steps.Add("<color=#CCB833>Blok: 64-bit | Anahtar: 56-bit (64-bit girilir)</color>");
+            steps.Add("");
+
+            // Girdi
+            steps.Add($"<color=#88CC88>[Girdi]</color> Veri ({fmtLabel} formatinda):");
+            steps.Add("  " + CryptoFormatter.BytesToFormat(ptBytes, fmt));
+            steps.Add($"  Uzunluk: {ptBytes.Length} byte");
             steps.Add("");
 
             // Padding
@@ -179,25 +171,32 @@ namespace Kriptoloji.Crypto
 
             // Gercek sonuc
             byte[] cipherAll = DESCipher.Encrypt(ptBytes, key);
-            steps.Add("<color=#88CC88>[Sonuc]</color> Sifreli metin:");
-            steps.Add("  " + DESCipher.BytesToHex(cipherAll));
+            steps.Add($"<color=#88CC88>[Sonuc]</color> Sifreli veri ({cipherFmtLabel}):");
+            steps.Add("  " + CryptoFormatter.BytesToFormat(cipherAll, cipherFmt));
 
             return steps;
         }
 
         // ==================== AES Gorsellestirme ====================
 
-        public static List<string> VisualizeAESEncrypt(string plaintext, string keyHex)
+        public static List<string> VisualizeAESEncrypt(byte[] ptBytes, byte[] key, OutputFormat fmt)
         {
             var steps = new List<string>();
-            byte[] ptBytes = Encoding.UTF8.GetBytes(plaintext);
-            byte[] key = AESCipher.HexToBytes(keyHex);
+            OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+            string fmtLabel = GetFormatLabel(fmt);
+            string cipherFmtLabel = GetFormatLabel(cipherFmt);
             int Nk = key.Length / 4;
             int Nr = Nk + 6;
 
             steps.Add("<color=#4DC8FF><b>===  AES SIFRELEME ADIMLARI  ===</b></color>");
             steps.Add("");
             steps.Add($"<color=#CCB833>Mod: AES-{key.Length * 8} | Blok: 128-bit | Round: {Nr}</color>");
+            steps.Add("");
+
+            // Girdi
+            steps.Add($"<color=#88CC88>[Girdi]</color> Veri ({fmtLabel} formatinda):");
+            steps.Add("  " + CryptoFormatter.BytesToFormat(ptBytes, fmt));
+            steps.Add($"  Uzunluk: {ptBytes.Length} byte");
             steps.Add("");
 
             // Padding
@@ -280,13 +279,40 @@ namespace Kriptoloji.Crypto
 
             // Sonuc
             byte[] cipherAll = AESCipher.Encrypt(ptBytes, key);
-            steps.Add("<color=#88CC88>[Sonuc]</color> Sifreli metin:");
-            steps.Add("  " + AESCipher.BytesToHex(cipherAll));
+            steps.Add($"<color=#88CC88>[Sonuc]</color> Sifreli veri ({cipherFmtLabel}):");
+            steps.Add("  " + CryptoFormatter.BytesToFormat(cipherAll, cipherFmt));
 
             return steps;
         }
 
         // ==================== Yardimci Metodlar ====================
+
+        private static string GetFormatLabel(OutputFormat fmt)
+        {
+            switch (fmt)
+            {
+                case OutputFormat.Hex: return "Hex";
+                case OutputFormat.Binary: return "Binary";
+                case OutputFormat.Decimal: return "Decimal";
+                case OutputFormat.Base64: return "Base64";
+                case OutputFormat.Text: return "Metin (UTF-8)";
+                default: return "Hex";
+            }
+        }
+
+        private static string FormatSingleByte(byte b, OutputFormat fmt)
+        {
+            switch (fmt)
+            {
+                case OutputFormat.Binary:
+                    return Convert.ToString(b, 2).PadLeft(8, '0');
+                case OutputFormat.Decimal:
+                    return b.ToString();
+                case OutputFormat.Hex:
+                default:
+                    return b.ToString("X2");
+            }
+        }
 
         private static string FormatBytes(byte[] bytes)
         {
