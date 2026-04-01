@@ -31,8 +31,11 @@ namespace Kriptoloji.Crypto
         /// </summary>
         public static byte[] Encrypt(byte[] plaintext, byte[] key)
         {
-            if (key.Length < plaintext.Length)
-                throw new ArgumentException("Anahtar, mesajdan kisa olamaz! OTP kurali: |K| >= |M|");
+            int messageBits = plaintext.Length * 8;
+            int keyBits = key.Length * 8;
+            if (keyBits != messageBits)
+                throw new ArgumentException(
+                    $"Anahtar ({keyBits} bit) ile mesaj ({messageBits} bit) bit uzunluklari esit olmalidir! OTP kurali: |K| = |M|");
 
             byte[] ciphertext = new byte[plaintext.Length];
             for (int i = 0; i < plaintext.Length; i++)
@@ -47,8 +50,11 @@ namespace Kriptoloji.Crypto
         /// </summary>
         public static byte[] Decrypt(byte[] ciphertext, byte[] key)
         {
-            if (key.Length < ciphertext.Length)
-                throw new ArgumentException("Anahtar, sifreli metinden kisa olamaz!");
+            int cipherBits = ciphertext.Length * 8;
+            int keyBits = key.Length * 8;
+            if (keyBits != cipherBits)
+                throw new ArgumentException(
+                    $"Anahtar ({keyBits} bit) ile sifreli metin ({cipherBits} bit) bit uzunluklari esit olmalidir! OTP kurali: |K| = |M|");
 
             byte[] plaintext = new byte[ciphertext.Length];
             for (int i = 0; i < ciphertext.Length; i++)

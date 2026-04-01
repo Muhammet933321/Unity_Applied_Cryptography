@@ -22,34 +22,44 @@ namespace Kriptoloji.Crypto
             if (keyBytes == null || keyBytes.Length == 0)
             {
                 keyBytes = new byte[ptBytes.Length];
-                new System.Random().NextBytes(keyBytes);
+                using (var rng = new System.Security.Cryptography.RNGCryptoServiceProvider())
+                {
+                    rng.GetBytes(keyBytes);
+                }
+            }
+            else if (keyBytes.Length != ptBytes.Length)
+            {
+                steps.Add("<color=#FF4444><b>HATA:</b> Anahtar (" + (keyBytes.Length * 8) + " bit) ile mesaj (" + (ptBytes.Length * 8) + " bit) bit uzunluklari esit degil! OTP kurali: |K| = |M|</color>");
+                return steps;
             }
 
             steps.Add("<color=#4DC8FF><b>===  OTP (One-Time Pad) SIFRELEME  ===</b></color>");
             steps.Add("");
-            steps.Add("<color=#CCB833>Kural:  C = M XOR K  (her byte birebir XOR'lanir)</color>");
+            steps.Add("<color=#CCB833>Kural:  C = M XOR K  (her bit birebir XOR'lanir)</color>");
             steps.Add("");
 
             // Veri
             steps.Add($"<color=#88CC88>[Adim 1]</color> Veri ({fmtLabel} formatinda):");
             steps.Add("  " + CryptoFormatter.BytesToFormat(ptBytes, fmt));
-            steps.Add($"  Uzunluk: {ptBytes.Length} byte");
+            steps.Add($"  Uzunluk: {ptBytes.Length * 8} bit ({ptBytes.Length} byte)");
             steps.Add("");
 
             // Anahtar
             steps.Add($"<color=#88CC88>[Adim 2]</color> Anahtar ({fmtLabel} formatinda, ayni uzunlukta):");
             steps.Add("  K = " + CryptoFormatter.BytesToFormat(keyBytes, fmt));
-            steps.Add($"  Byte uzunlugu:  |M| = {ptBytes.Length}  |  |K| = {keyBytes.Length}");
+            steps.Add($"  Bit uzunlugu:  |M| = {ptBytes.Length * 8} bit  |  |K| = {keyBytes.Length * 8} bit");
             steps.Add("");
 
             // XOR islemleri
-            steps.Add("<color=#88CC88>[Adim 3]</color> Byte byte XOR islemi:");
+            steps.Add("<color=#88CC88>[Adim 3]</color> Bit bazinda XOR islemi (byte byte gosterim):");
             byte[] cipher = new byte[ptBytes.Length];
             int showCount = Math.Min(ptBytes.Length, 6);
             for (int i = 0; i < showCount; i++)
             {
                 cipher[i] = (byte)(ptBytes[i] ^ keyBytes[i]);
-                string line = $"  Byte {i}: {FormatSingleByte(ptBytes[i], fmt)} XOR {FormatSingleByte(keyBytes[i], fmt)} = <color=#FFAA44>{FormatSingleByte(cipher[i], fmt)}</color>";
+                int bitStart = i * 8;
+                int bitEnd = bitStart + 7;
+                string line = $"  Bit [{bitStart}-{bitEnd}]: {FormatSingleByte(ptBytes[i], fmt)} XOR {FormatSingleByte(keyBytes[i], fmt)} = <color=#FFAA44>{FormatSingleByte(cipher[i], fmt)}</color>";
                 if (fmt != OutputFormat.Binary)
                     line += $"    ({Convert.ToString(ptBytes[i], 2).PadLeft(8, '0')} XOR {Convert.ToString(keyBytes[i], 2).PadLeft(8, '0')} = {Convert.ToString(cipher[i], 2).PadLeft(8, '0')})";
                 steps.Add(line);
@@ -58,7 +68,7 @@ namespace Kriptoloji.Crypto
                 cipher[i] = (byte)(ptBytes[i] ^ keyBytes[i]);
 
             if (ptBytes.Length > showCount)
-                steps.Add($"  ... ({ptBytes.Length - showCount} byte daha)");
+                steps.Add($"  ... ({(ptBytes.Length - showCount) * 8} bit daha)");
             steps.Add("");
 
             // Sonuc
@@ -296,6 +306,7 @@ namespace Kriptoloji.Crypto
                 case OutputFormat.Decimal: return "Decimal";
                 case OutputFormat.Base64: return "Base64";
                 case OutputFormat.Text: return "Metin (UTF-8)";
+                case OutputFormat.ASCII: return "ASCII";
                 default: return "Hex";
             }
         }

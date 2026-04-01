@@ -295,6 +295,35 @@
     flex-shrink: 0;
 }
 
+.inline-dropdown {
+    height: 34px;
+    min-width: 160px;
+    max-width: 200px;
+    font-size: 12px;
+    background-color: var(--color-input-bg);
+    border-width: 1px;
+    border-color: var(--color-input-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.inline-dropdown .unity-base-popup-field__input {
+    background-color: var(--color-input-bg);
+    border-width: 0;
+    color: var(--color-text);
+    padding-left: 6px;
+}
+
+.inline-dropdown .unity-text-element {
+    color: var(--color-text);
+}
+
+.inline-dropdown .unity-base-popup-field__arrow {
+    -unity-background-image-tint-color: var(--color-text-dim);
+}
+
 .aes-dropdown .unity-base-popup-field__input {
     background-color: var(--color-input-bg);
     border-width: 0;

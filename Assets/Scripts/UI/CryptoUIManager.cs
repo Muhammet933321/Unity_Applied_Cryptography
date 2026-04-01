@@ -11,17 +11,17 @@ namespace Kriptoloji.UI
     {
         // OTP
         private TextField otpPlain, otpKey, otpCipher, otpDecCipher, otpDecKey, otpDecOutput;
-        private DropdownField otpFormat;
+        private DropdownField otpFormat, otpKeyFormat, otpCipherFormat;
         private Label otpStatus;
 
         // DES
         private TextField desPlain, desKey, desCipher, desDecCipher, desDecKey, desDecOutput;
-        private DropdownField desFormat;
+        private DropdownField desFormat, desKeyFormat, desCipherFormat;
         private Label desStatus;
 
         // AES
         private TextField aesPlain, aesKey, aesCipher, aesDecCipher, aesDecKey, aesDecOutput;
-        private DropdownField aesKeySize, aesFormat;
+        private DropdownField aesKeySize, aesFormat, aesKeyFormat, aesCipherFormat;
         private Label aesStatus;
 
         // Panels & Tabs
@@ -54,6 +54,8 @@ namespace Kriptoloji.UI
             otpDecKey = root.Q<TextField>("otp-dec-key");
             otpDecOutput = root.Q<TextField>("otp-dec-output");
             otpFormat = root.Q<DropdownField>("otp-format");
+            otpKeyFormat = root.Q<DropdownField>("otp-key-format");
+            otpCipherFormat = root.Q<DropdownField>("otp-cipher-format");
             otpStatus = root.Q<Label>("otp-status");
 
             // DES fields
@@ -64,6 +66,8 @@ namespace Kriptoloji.UI
             desDecKey = root.Q<TextField>("des-dec-key");
             desDecOutput = root.Q<TextField>("des-dec-output");
             desFormat = root.Q<DropdownField>("des-format");
+            desKeyFormat = root.Q<DropdownField>("des-key-format");
+            desCipherFormat = root.Q<DropdownField>("des-cipher-format");
             desStatus = root.Q<Label>("des-status");
 
             // AES fields
@@ -75,6 +79,8 @@ namespace Kriptoloji.UI
             aesDecOutput = root.Q<TextField>("aes-dec-output");
             aesKeySize = root.Q<DropdownField>("aes-keysize");
             aesFormat = root.Q<DropdownField>("aes-format");
+            aesKeyFormat = root.Q<DropdownField>("aes-key-format");
+            aesCipherFormat = root.Q<DropdownField>("aes-cipher-format");
             aesStatus = root.Q<Label>("aes-status");
 
             // Visualization
@@ -108,35 +114,39 @@ namespace Kriptoloji.UI
             root.Q<Button>("visual-close").clicked += () =>
                 visualOverlay.RemoveFromClassList("overlay-active");
 
-            // Format degisim callback'leri (format switch = alan donusumu)
+            // Format degisim callback'leri -- veri formati
             RegisterFormatChangeCallback(otpFormat, otpStatus,
-                new[] { otpPlain, otpKey, otpDecKey },
-                new[] { otpCipher, otpDecCipher, otpDecOutput },
-                true);
+                new[] { otpPlain, otpDecOutput });
             RegisterFormatChangeCallback(desFormat, desStatus,
-                new[] { desPlain },
-                new[] { desKey, desCipher, desDecCipher, desDecKey, desDecOutput },
-                false);
+                new[] { desPlain, desDecOutput });
             RegisterFormatChangeCallback(aesFormat, aesStatus,
-                new[] { aesPlain },
-                new[] { aesKey, aesCipher, aesDecCipher, aesDecKey, aesDecOutput },
-                false);
+                new[] { aesPlain, aesDecOutput });
+
+            // Format degisim callback'leri -- anahtar formati
+            RegisterKeyFormatChangeCallback(otpKeyFormat, new[] { otpKey, otpDecKey });
+            RegisterKeyFormatChangeCallback(desKeyFormat, new[] { desKey, desDecKey });
+            RegisterKeyFormatChangeCallback(aesKeyFormat, new[] { aesKey, aesDecKey });
+
+            // Format degisim callback'leri -- sifreli formati
+            RegisterKeyFormatChangeCallback(otpCipherFormat, new[] { otpCipher, otpDecCipher });
+            RegisterKeyFormatChangeCallback(desCipherFormat, new[] { desCipher, desDecCipher });
+            RegisterKeyFormatChangeCallback(aesCipherFormat, new[] { aesCipher, aesDecCipher });
 
             // Girdi dogrulama callback'leri
-            RegisterInputValidation(otpPlain, otpFormat, false);
-            RegisterInputValidation(otpKey, otpFormat, false);
-            RegisterInputValidation(otpDecCipher, otpFormat, true);
-            RegisterInputValidation(otpDecKey, otpFormat, false);
+            RegisterInputValidation(otpPlain, otpFormat);
+            RegisterInputValidation(otpKey, otpKeyFormat);
+            RegisterInputValidation(otpDecCipher, otpCipherFormat);
+            RegisterInputValidation(otpDecKey, otpKeyFormat);
 
-            RegisterInputValidation(desPlain, desFormat, false);
-            RegisterInputValidation(desKey, desFormat, true);
-            RegisterInputValidation(desDecCipher, desFormat, true);
-            RegisterInputValidation(desDecKey, desFormat, true);
+            RegisterInputValidation(desPlain, desFormat);
+            RegisterInputValidation(desKey, desKeyFormat);
+            RegisterInputValidation(desDecCipher, desCipherFormat);
+            RegisterInputValidation(desDecKey, desKeyFormat);
 
-            RegisterInputValidation(aesPlain, aesFormat, false);
-            RegisterInputValidation(aesKey, aesFormat, true);
-            RegisterInputValidation(aesDecCipher, aesFormat, true);
-            RegisterInputValidation(aesDecKey, aesFormat, true);
+            RegisterInputValidation(aesPlain, aesFormat);
+            RegisterInputValidation(aesKey, aesKeyFormat);
+            RegisterInputValidation(aesDecCipher, aesCipherFormat);
+            RegisterInputValidation(aesDecKey, aesKeyFormat);
 
             ShowPanel("OTP");
         }
@@ -144,16 +154,14 @@ namespace Kriptoloji.UI
         // ==================== Girdi Dogrulama ====================
         private bool _isSanitizing;
 
-        private void RegisterInputValidation(TextField field, DropdownField formatDropdown, bool isCipherField)
+        private void RegisterInputValidation(TextField field, DropdownField formatDropdown)
         {
             if (field == null || formatDropdown == null) return;
             field.RegisterValueChangedCallback(evt =>
             {
                 if (_isSanitizing) return;
                 OutputFormat fmt = GetSelectedFormat(formatDropdown);
-                if (isCipherField)
-                    fmt = CryptoFormatter.GetCipherFormat(fmt);
-                if (fmt == OutputFormat.Text) return;
+                if (fmt == OutputFormat.Text || fmt == OutputFormat.ASCII) return;
 
                 string sanitized = CryptoFormatter.SanitizeInput(evt.newValue, fmt);
                 if (sanitized != evt.newValue)
@@ -174,9 +182,7 @@ namespace Kriptoloji.UI
         private void RegisterFormatChangeCallback(
             DropdownField formatDropdown,
             Label statusLabel,
-            TextField[] textFields,
-            TextField[] cipherFields,
-            bool isOtp)
+            TextField[] textFields)
         {
             if (formatDropdown == null) return;
             formatDropdown.RegisterValueChangedCallback(evt =>
@@ -187,23 +193,32 @@ namespace Kriptoloji.UI
 
                 OutputFormat oldFmt = CryptoFormatter.FromIndex(oldIdx);
                 OutputFormat newFmt = CryptoFormatter.FromIndex(newIdx);
-                OutputFormat oldCipherFmt = CryptoFormatter.GetCipherFormat(oldFmt);
-                OutputFormat newCipherFmt = CryptoFormatter.GetCipherFormat(newFmt);
 
                 _isSanitizing = true;
 
-                // Duz metin alanlari (Text formatiyla calisan)
                 foreach (var field in textFields)
                     ConvertFieldValue(field, oldFmt, newFmt);
 
-                // Sifreli/anahtar alanlari (cipher formatiyla calisan)
-                foreach (var field in cipherFields)
-                    ConvertFieldValue(field, oldCipherFmt, newCipherFmt);
-
                 _isSanitizing = false;
+            });
+        }
 
-                if (newFmt == OutputFormat.Text && !isOtp)
-                    SetStatus(statusLabel, "Text modda anahtar ve sifreli metin Hex olarak gosterilir.", false);
+        private void RegisterKeyFormatChangeCallback(DropdownField keyFormatDropdown, TextField[] keyFields)
+        {
+            if (keyFormatDropdown == null) return;
+            keyFormatDropdown.RegisterValueChangedCallback(evt =>
+            {
+                int oldIdx = System.Array.IndexOf(CryptoFormatter.FormatLabels, evt.previousValue);
+                int newIdx = System.Array.IndexOf(CryptoFormatter.FormatLabels, evt.newValue);
+                if (oldIdx < 0 || newIdx < 0 || oldIdx == newIdx) return;
+
+                OutputFormat oldFmt = CryptoFormatter.FromIndex(oldIdx);
+                OutputFormat newFmt = CryptoFormatter.FromIndex(newIdx);
+
+                _isSanitizing = true;
+                foreach (var field in keyFields)
+                    ConvertFieldValue(field, oldFmt, newFmt);
+                _isSanitizing = false;
             });
         }
 
@@ -269,10 +284,12 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(otpFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+                OutputFormat keyFmt = GetSelectedFormat(otpKeyFormat);
+                OutputFormat cipherFmt = GetSelectedFormat(otpCipherFormat);
+
+                int ptBits = CryptoFormatter.GetBitCount(plainInput, fmt);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
 
-                // Girdiyi normalize et (orn. binary "1001" -> "00001001")
                 if (fmt != OutputFormat.Text)
                     otpPlain.SetValueWithoutNotify(CryptoFormatter.BytesToFormat(ptBytes, fmt));
 
@@ -280,17 +297,18 @@ namespace Kriptoloji.UI
                 byte[] keyBytes;
                 if (string.IsNullOrEmpty(keyInput))
                 {
-                    keyBytes = OTPGenerateKeyBytes(ptBytes.Length, fmt);
-                    otpKey.value = CryptoFormatter.BytesToFormat(keyBytes, fmt);
+                    keyBytes = OTPGenerateKeyBytes(ptBytes.Length, keyFmt);
+                    otpKey.value = CryptoFormatter.BytesToFormat(keyBytes, keyFmt);
                 }
                 else
                 {
-                    keyBytes = CryptoFormatter.FormatToBytes(keyInput, fmt);
-                    if (keyBytes.Length != ptBytes.Length)
+                    int keyBits = CryptoFormatter.GetBitCount(keyInput, keyFmt);
+                    if (keyBits != ptBits)
                     {
-                        SetStatus(otpStatus, $"OTP kurali: Anahtar ({keyBytes.Length} byte) ve metin ({ptBytes.Length} byte) ayni uzunlukta olmali!", true);
+                        SetStatus(otpStatus, $"OTP kurali: Anahtar ({keyBits} bit) ve metin ({ptBits} bit) bit uzunluklari esit olmali!", true);
                         return;
                     }
+                    keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
                 }
 
                 byte[] cipherBytes = OTPCipher.Encrypt(ptBytes, keyBytes);
@@ -298,8 +316,6 @@ namespace Kriptoloji.UI
                 string msg = string.IsNullOrEmpty(keyInput)
                     ? "Sifreleme basarili! Anahtar otomatik uretildi."
                     : "Sifreleme basarili!";
-                if (fmt == OutputFormat.Text)
-                    msg += " (Sifreli metin Hex olarak gosteriliyor)";
                 SetStatus(otpStatus, msg, false);
             }
             catch (Exception ex)
@@ -322,14 +338,19 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(otpFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
-                byte[] cipherBytes = CryptoFormatter.FormatToBytes(cipherInput, cipherFmt);
-                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, fmt);
-                if (keyBytes.Length != cipherBytes.Length)
+                OutputFormat keyFmt = GetSelectedFormat(otpKeyFormat);
+                OutputFormat cipherFmt = GetSelectedFormat(otpCipherFormat);
+
+                int cipherBits = CryptoFormatter.GetBitCount(cipherInput, cipherFmt);
+                int keyBits = CryptoFormatter.GetBitCount(keyInput, keyFmt);
+                if (keyBits != cipherBits)
                 {
-                    SetStatus(otpStatus, $"OTP kurali: Anahtar ({keyBytes.Length} byte) ve sifreli metin ({cipherBytes.Length} byte) ayni uzunlukta olmali!", true);
+                    SetStatus(otpStatus, $"OTP kurali: Anahtar ({keyBits} bit) ve sifreli metin ({cipherBits} bit) bit uzunluklari esit olmali!", true);
                     return;
                 }
+
+                byte[] cipherBytes = CryptoFormatter.FormatToBytes(cipherInput, cipherFmt);
+                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
                 byte[] plainBytes = OTPCipher.Decrypt(cipherBytes, keyBytes);
                 otpDecOutput.value = CryptoFormatter.BytesToFormat(plainBytes, fmt);
                 SetStatus(otpStatus, "Cozme basarili!", false);
@@ -352,15 +373,16 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(otpFormat);
+                OutputFormat keyFmt = GetSelectedFormat(otpKeyFormat);
+                int ptBits = CryptoFormatter.GetBitCount(plainInput, fmt);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
 
-                // Girdiyi normalize et
                 if (fmt != OutputFormat.Text)
                     otpPlain.SetValueWithoutNotify(CryptoFormatter.BytesToFormat(ptBytes, fmt));
 
-                byte[] keyBytes = OTPGenerateKeyBytes(ptBytes.Length, fmt);
-                otpKey.value = CryptoFormatter.BytesToFormat(keyBytes, fmt);
-                SetStatus(otpStatus, $"Anahtar uretildi ({ptBytes.Length} byte).", false);
+                byte[] keyBytes = OTPGenerateKeyBytes(ptBytes.Length, keyFmt);
+                otpKey.value = CryptoFormatter.BytesToFormat(keyBytes, keyFmt);
+                SetStatus(otpStatus, $"Anahtar uretildi ({ptBits} bit).", false);
             }
             catch (Exception ex)
             {
@@ -370,9 +392,9 @@ namespace Kriptoloji.UI
 
         private byte[] OTPGenerateKeyBytes(int length, OutputFormat fmt)
         {
-            if (fmt == OutputFormat.Text)
+            if (fmt == OutputFormat.Text || fmt == OutputFormat.ASCII)
             {
-                // Text modda yazdirabilir ASCII uret (UTF-8 round-trip guvenli)
+                // Text/ASCII modda yazdiribilir ASCII uret (round-trip guvenli)
                 string textKey = OTPCipher.GenerateTextKey(length);
                 return System.Text.Encoding.UTF8.GetBytes(textKey);
             }
@@ -400,15 +422,13 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(desFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+                OutputFormat keyFmt = GetSelectedFormat(desKeyFormat);
+                OutputFormat cipherFmt = GetSelectedFormat(desCipherFormat);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
-                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
+                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
                 byte[] cipherBytes = DESCipher.Encrypt(ptBytes, keyBytes);
                 desCipher.value = CryptoFormatter.BytesToFormat(cipherBytes, cipherFmt);
-                string msg = "DES sifreleme basarili!";
-                if (fmt == OutputFormat.Text)
-                    msg += " (Anahtar ve sifreli metin Hex olarak gosteriliyor)";
-                SetStatus(desStatus, msg, false);
+                SetStatus(desStatus, "DES sifreleme basarili!", false);
             }
             catch (Exception ex)
             {
@@ -430,9 +450,10 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(desFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+                OutputFormat keyFmt = GetSelectedFormat(desKeyFormat);
+                OutputFormat cipherFmt = GetSelectedFormat(desCipherFormat);
                 byte[] cipherBytes = CryptoFormatter.FormatToBytes(cipherInput, cipherFmt);
-                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
+                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
                 byte[] plainBytes = DESCipher.Decrypt(cipherBytes, keyBytes);
                 desDecOutput.value = CryptoFormatter.BytesToFormat(plainBytes, fmt);
                 SetStatus(desStatus, "DES cozme basarili!", false);
@@ -450,9 +471,8 @@ namespace Kriptoloji.UI
             {
                 rng.GetBytes(key);
             }
-            OutputFormat fmt = GetSelectedFormat(desFormat);
-            OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
-            desKey.value = CryptoFormatter.BytesToFormat(key, cipherFmt);
+            OutputFormat keyFmt = GetSelectedFormat(desKeyFormat);
+            desKey.value = CryptoFormatter.BytesToFormat(key, keyFmt);
             SetStatus(desStatus, "8-byte DES anahtari uretildi.", false);
         }
 
@@ -477,15 +497,13 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(aesFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+                OutputFormat keyFmt = GetSelectedFormat(aesKeyFormat);
+                OutputFormat cipherFmt = GetSelectedFormat(aesCipherFormat);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
-                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
+                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
                 byte[] cipherBytes = AESCipher.Encrypt(ptBytes, keyBytes);
                 aesCipher.value = CryptoFormatter.BytesToFormat(cipherBytes, cipherFmt);
-                string msg = "AES sifreleme basarili!";
-                if (fmt == OutputFormat.Text)
-                    msg += " (Anahtar ve sifreli metin Hex olarak gosteriliyor)";
-                SetStatus(aesStatus, msg, false);
+                SetStatus(aesStatus, "AES sifreleme basarili!", false);
             }
             catch (Exception ex)
             {
@@ -507,9 +525,10 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(aesFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+                OutputFormat keyFmt = GetSelectedFormat(aesKeyFormat);
+                OutputFormat cipherFmt = GetSelectedFormat(aesCipherFormat);
                 byte[] cipherBytes = CryptoFormatter.FormatToBytes(cipherInput, cipherFmt);
-                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
+                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
                 byte[] plainBytes = AESCipher.Decrypt(cipherBytes, keyBytes);
                 aesDecOutput.value = CryptoFormatter.BytesToFormat(plainBytes, fmt);
                 SetStatus(aesStatus, "AES cozme basarili!", false);
@@ -538,9 +557,8 @@ namespace Kriptoloji.UI
             {
                 rng.GetBytes(key);
             }
-            OutputFormat fmt = GetSelectedFormat(aesFormat);
-            OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
-            aesKey.value = CryptoFormatter.BytesToFormat(key, cipherFmt);
+            OutputFormat keyFmt = GetSelectedFormat(aesKeyFormat);
+            aesKey.value = CryptoFormatter.BytesToFormat(key, keyFmt);
             SetStatus(aesStatus, $"AES-{keySize * 8} anahtari uretildi ({keySize} byte).", false);
         }
 
@@ -575,13 +593,14 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(otpFormat);
+                OutputFormat keyFmt = GetSelectedFormat(otpKeyFormat);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
 
                 string keyInput = otpKey.value;
                 byte[] keyBytes = null;
                 if (!string.IsNullOrEmpty(keyInput))
                 {
-                    keyBytes = CryptoFormatter.FormatToBytes(keyInput, fmt);
+                    keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
                 }
 
                 var steps = CryptoVisualizer.VisualizeOTPEncrypt(ptBytes, keyBytes, fmt);
@@ -611,9 +630,9 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(desFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+                OutputFormat keyFmt = GetSelectedFormat(desKeyFormat);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
-                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
+                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
 
                 if (keyBytes.Length != 8)
                 {
@@ -648,9 +667,9 @@ namespace Kriptoloji.UI
                 }
 
                 OutputFormat fmt = GetSelectedFormat(aesFormat);
-                OutputFormat cipherFmt = CryptoFormatter.GetCipherFormat(fmt);
+                OutputFormat keyFmt = GetSelectedFormat(aesKeyFormat);
                 byte[] ptBytes = CryptoFormatter.FormatToBytes(plainInput, fmt);
-                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, cipherFmt);
+                byte[] keyBytes = CryptoFormatter.FormatToBytes(keyInput, keyFmt);
 
                 var steps = CryptoVisualizer.VisualizeAESEncrypt(ptBytes, keyBytes, fmt);
                 ShowVisualization(steps);

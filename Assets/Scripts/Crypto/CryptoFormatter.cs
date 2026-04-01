@@ -11,7 +11,8 @@ namespace Kriptoloji.Crypto
         Binary,     // 2'lik taban
         Decimal,    // 10'luk taban
         Base64,     // Base64 kodlama
-        Text        // UTF-8 metin (ham)
+        Text,       // UTF-8 metin (ham)
+        ASCII       // ASCII metin (7-bit, 1 byte/karakter)
     }
 
     public static class CryptoFormatter
@@ -21,7 +22,8 @@ namespace Kriptoloji.Crypto
             "Binary (Taban 2)",
             "Decimal (Taban 10)",
             "Base64",
-            "Metin (UTF-8)"
+            "Metin (UTF-8)",
+            "ASCII"
         };
 
         public static OutputFormat FromIndex(int index)
@@ -33,6 +35,7 @@ namespace Kriptoloji.Crypto
                 case 2: return OutputFormat.Decimal;
                 case 3: return OutputFormat.Base64;
                 case 4: return OutputFormat.Text;
+                case 5: return OutputFormat.ASCII;
                 default: return OutputFormat.Hex;
             }
         }
@@ -58,6 +61,9 @@ namespace Kriptoloji.Crypto
 
                 case OutputFormat.Text:
                     return Encoding.UTF8.GetString(data);
+
+                case OutputFormat.ASCII:
+                    return Encoding.ASCII.GetString(data);
 
                 default:
                     return BytesToHex(data);
@@ -86,6 +92,12 @@ namespace Kriptoloji.Crypto
 
                 case OutputFormat.Text:
                     return Encoding.UTF8.GetBytes(input);
+
+                case OutputFormat.ASCII:
+                    foreach (char c in input)
+                        if (c > 127)
+                            throw new FormatException($"ASCII desteklenmeyen karakter: '{c}' (kod: {(int)c}). ASCII yalnizca 0-127 arasi karakterleri destekler.");
+                    return Encoding.ASCII.GetBytes(input);
 
                 default:
                     return HexToBytes(input);
@@ -116,6 +128,9 @@ namespace Kriptoloji.Crypto
                 case OutputFormat.Text:
                     return value;
 
+                case OutputFormat.ASCII:
+                    return Regex.Replace(value, @"[^\x00-\x7F]", "");
+
                 default:
                     return value;
             }
@@ -127,7 +142,51 @@ namespace Kriptoloji.Crypto
         /// </summary>
         public static OutputFormat GetCipherFormat(OutputFormat format)
         {
-            return format == OutputFormat.Text ? OutputFormat.Hex : format;
+            return (format == OutputFormat.Text || format == OutputFormat.ASCII) ? OutputFormat.Hex : format;
+        }
+
+        /// <summary>
+        /// Girdi stringinin gercek bit uzunlugunu hesaplar.
+        /// Binary: karakter sayisi (0/1), Hex: hex digit * 4,
+        /// Decimal/Base64/Text: byte sayisi * 8.
+        /// </summary>
+        public static int GetBitCount(string input, OutputFormat format)
+        {
+            if (string.IsNullOrEmpty(input)) return 0;
+            input = input.Trim();
+
+            switch (format)
+            {
+                case OutputFormat.Binary:
+                    // Her '0' veya '1' karakteri 1 bit
+                    int bits = 0;
+                    foreach (char c in input)
+                        if (c == '0' || c == '1') bits++;
+                    return bits;
+
+                case OutputFormat.Hex:
+                    // Her hex digit 4 bit
+                    int hexDigits = 0;
+                    foreach (char c in input)
+                        if (Uri.IsHexDigit(c)) hexDigits++;
+                    return hexDigits * 4;
+
+                case OutputFormat.Decimal:
+                    return FormatToBytes(input, format).Length * 8;
+
+                case OutputFormat.Base64:
+                    return FormatToBytes(input, format).Length * 8;
+
+                case OutputFormat.Text:
+                    return Encoding.UTF8.GetBytes(input).Length * 8;
+
+                case OutputFormat.ASCII:
+                    // ASCII: her karakter tam 1 byte = 8 bit
+                    return input.Length * 8;
+
+                default:
+                    return FormatToBytes(input, format).Length * 8;
+            }
         }
 
         // ---- Hex ----
