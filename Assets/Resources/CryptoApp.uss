@@ -189,6 +189,14 @@
     border-color: var(--color-accent);
 }
 
+.form-input.input-error {
+    border-color: var(--color-red);
+}
+
+.form-input.input-error:focus {
+    border-color: var(--color-red-hover);
+}
+
 .form-input.readonly {
     background-color: rgb(20, 28, 46);
     color: var(--color-text-dim);

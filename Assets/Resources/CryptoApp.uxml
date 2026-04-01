@@ -23,6 +23,12 @@
 
                 <ui:Label text="SIFRELEME" class="section-label" />
 
+                <ui:VisualElement class="dropdown-row">
+                    <ui:Label text="Veri Formati:" class="dropdown-label" />
+                    <ui:DropdownField name="otp-format" class="aes-dropdown"
+                        choices="Hex (Taban 16),Binary (Taban 2),Decimal (Taban 10),Base64,Metin (UTF-8)" index="4" />
+                </ui:VisualElement>
+
                 <ui:VisualElement class="form-row">
                     <ui:Label text="Duz Metin:" class="form-label" />
                     <ui:TextField name="otp-plain" class="form-input" />
@@ -40,7 +46,7 @@
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:Label text="Sifreli:" class="form-label" />
                     <ui:TextField name="otp-cipher" class="form-input readonly" readonly="true" />
                 </ui:VisualElement>
 
@@ -48,7 +54,7 @@
                 <ui:Label text="SIFRE COZME" class="section-label" />
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:Label text="Sifreli:" class="form-label" />
                     <ui:TextField name="otp-dec-cipher" class="form-input" />
                 </ui:VisualElement>
 
@@ -62,7 +68,7 @@
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Cozulmus Metin:" class="form-label" />
+                    <ui:Label text="Cozulmus:" class="form-label" />
                     <ui:TextField name="otp-dec-output" class="form-input readonly" readonly="true" />
                 </ui:VisualElement>
 
@@ -75,13 +81,19 @@
 
                 <ui:Label text="SIFRELEME" class="section-label" />
 
+                <ui:VisualElement class="dropdown-row">
+                    <ui:Label text="Veri Formati:" class="dropdown-label" />
+                    <ui:DropdownField name="des-format" class="aes-dropdown"
+                        choices="Hex (Taban 16),Binary (Taban 2),Decimal (Taban 10),Base64,Metin (UTF-8)" index="0" />
+                </ui:VisualElement>
+
                 <ui:VisualElement class="form-row">
                     <ui:Label text="Duz Metin:" class="form-label" />
                     <ui:TextField name="des-plain" class="form-input" />
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:Label text="Anahtar:" class="form-label" />
                     <ui:TextField name="des-key" class="form-input" />
                 </ui:VisualElement>
 
@@ -92,7 +104,7 @@
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:Label text="Sifreli:" class="form-label" />
                     <ui:TextField name="des-cipher" class="form-input readonly" readonly="true" />
                 </ui:VisualElement>
 
@@ -100,12 +112,12 @@
                 <ui:Label text="SIFRE COZME" class="section-label" />
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:Label text="Sifreli:" class="form-label" />
                     <ui:TextField name="des-dec-cipher" class="form-input" />
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:Label text="Anahtar:" class="form-label" />
                     <ui:TextField name="des-dec-key" class="form-input" />
                 </ui:VisualElement>
 
@@ -114,7 +126,7 @@
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Cozulmus Metin:" class="form-label" />
+                    <ui:Label text="Cozulmus:" class="form-label" />
                     <ui:TextField name="des-dec-output" class="form-input readonly" readonly="true" />
                 </ui:VisualElement>
 
@@ -133,13 +145,19 @@
                         choices="AES-128 (16 byte),AES-192 (24 byte),AES-256 (32 byte)" index="0" />
                 </ui:VisualElement>
 
+                <ui:VisualElement class="dropdown-row">
+                    <ui:Label text="Veri Formati:" class="dropdown-label" />
+                    <ui:DropdownField name="aes-format" class="aes-dropdown"
+                        choices="Hex (Taban 16),Binary (Taban 2),Decimal (Taban 10),Base64,Metin (UTF-8)" index="0" />
+                </ui:VisualElement>
+
                 <ui:VisualElement class="form-row">
                     <ui:Label text="Duz Metin:" class="form-label" />
                     <ui:TextField name="aes-plain" class="form-input" />
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:Label text="Anahtar:" class="form-label" />
                     <ui:TextField name="aes-key" class="form-input" />
                 </ui:VisualElement>
 
@@ -150,7 +168,7 @@
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:Label text="Sifreli:" class="form-label" />
                     <ui:TextField name="aes-cipher" class="form-input readonly" readonly="true" />
                 </ui:VisualElement>
 
@@ -158,12 +176,12 @@
                 <ui:Label text="SIFRE COZME" class="section-label" />
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Sifreli (Hex):" class="form-label" />
+                    <ui:Label text="Sifreli:" class="form-label" />
                     <ui:TextField name="aes-dec-cipher" class="form-input" />
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Anahtar (Hex):" class="form-label" />
+                    <ui:Label text="Anahtar:" class="form-label" />
                     <ui:TextField name="aes-dec-key" class="form-input" />
                 </ui:VisualElement>
 
@@ -172,7 +190,7 @@
                 </ui:VisualElement>
 
                 <ui:VisualElement class="form-row">
-                    <ui:Label text="Cozulmus Metin:" class="form-label" />
+                    <ui:Label text="Cozulmus:" class="form-label" />
                     <ui:TextField name="aes-dec-output" class="form-input readonly" readonly="true" />
                 </ui:VisualElement>
 
